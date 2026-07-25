@@ -1,0 +1,108 @@
+# ==========================================
+# 1. Seguridad, Entornos y Claves Privadas
+# ==========================================
+# Archivos de variables de entorno
+.env
+.env.*
+.devcontainer/secrets/
+
+# Llaves de firma, certificados y keystores (Android / iOS)
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+*.mobileprovision
+
+# ==========================================
+# 2. Cachés y Archivos Locales Temporales
+# ==========================================
+.gradle_cache/
+.pub_cache/
+.metadata
+.history
+
+# ==========================================
+# 3. Flutter, Dart y Pub
+# ==========================================
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+.analyzer_tools/
+**/doc/api/
+
+# Simbolización y Ofuscación
+app.*.symbols
+app.*.map.json
+
+# ==========================================
+# 4. Configuración Nativa de Android
+# ==========================================
+android/.gradle/
+android/app/build/
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# ==========================================
+# 5. Configuración Nativa de iOS y macOS
+# ==========================================
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/.last_build_id
+**/DerivedData/
+
+# Archivos de estado de Xcode
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserdata/
+
+# ==========================================
+# 6. IDEs y Editores de Código
+# ==========================================
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code (Si deseas compartir tareas/launch.json, mantén comentada la línea)
+#.vscode/
+
+# ==========================================
+# 7. Sistema Operativo y Basura Diversa
+# ==========================================
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Temporales de compilación general y scripts
+*.class
+*.log
+*.pyc
+*.swp
+.atom/
+.build/
+.buildlog/
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# ==========================================
+# Base de Datos Local (SQLite)
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm

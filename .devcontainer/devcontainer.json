@@ -1,0 +1,52 @@
+{
+    "name": "Flutter Development Env",
+  
+    // Indica que usaremos el Dockerfile que está en esta misma carpeta
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+  
+    // Reemplaza los montajes de tu archivo "run_container.sh"
+    "mounts": [
+        // Mapea la caché de pub para que persistan las dependencias descargadas
+        "source=${localWorkspaceFolder}/.pub_cache,target=/root/.pub-cache,type=bind",
+        // Mapea la caché de gradle para no descargar compilaciones de Android desde cero cada vez
+        "source=${localWorkspaceFolder}/.gradle_cache,target=/root/.gradle,type=bind",
+        // Heredar configuracion de git de la maquina fisica
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/root/.gitconfig,type=bind,readonly"
+    ],
+
+    // Configuraciones específicas de VS Code dentro del contenedor
+    "customizations": {
+        "vscode": {
+            // Instala automáticamente las extensiones necesarias en el contenedor
+            "extensions": [
+                "dart-code.dart-code",
+                "dart-code.flutter",
+                "usernamehw.errorlens",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode"
+            ],
+            
+            // Le dice a la extensión de Dart exactamente dónde está tu Flutter SDK (lo leímos de tu Dockerfile)
+            "settings": {
+                "dart.flutterSdkPath": "/root/flutter",
+                // Forzar 4 espacios de forma global
+                "editor.tabSize": 4,
+                "editor.insertSpaces": true,
+                "editor.detectIndentation": false,
+
+                // Configuración específica para Dart
+                "[dart]": {
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true,
+                    // Si no quieres que el formateador de Dart te lo regrese a 2 espacios al guardar:
+                    "editor.formatOnSave": false 
+                }
+            }
+        }
+    },
+
+    // Define el usuario con el que se ejecutará (en tu Dockerfile usas root)
+    "remoteUser": "root"
+}
