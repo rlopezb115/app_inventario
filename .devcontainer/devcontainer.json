@@ -5,6 +5,9 @@
     "build": {
         "dockerfile": "Dockerfile"
     },
+
+    // Crea las carpetas automáticamente en la máquina host antes de levantar el contenedor
+    "initializeCommand": "mkdir -p '${localWorkspaceFolder}/.pub_cache' '${localWorkspaceFolder}/.gradle_cache'",
   
     // Reemplaza los montajes de tu archivo "run_container.sh"
     "mounts": [

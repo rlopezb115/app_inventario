@@ -43,7 +43,7 @@ class ProductoLocalDataSource
 		return listaProductos;
   	}
 
-    Future<Producto?> obtenereProducto(int id, { AtomicSession? atomicSession }) async
+    Future<Producto?> obtenerProducto(int id, { AtomicSession? atomicSession }) async
 	{
         if (!id.esMayorACero) return null;
         final DatabaseExecutor executor = atomicSession != null
@@ -109,7 +109,7 @@ class ProductoLocalDataSource
         if (!producto.id.esMayorACero) return false;
 
         int filasAfectadas = 0;
-        final productoActual = await obtenereProducto(producto.id!, atomicSession: atomicSession);
+        final productoActual = await obtenerProducto(producto.id!, atomicSession: atomicSession);
         if (productoActual != null)
         {
             final DatabaseExecutor executor = atomicSession != null

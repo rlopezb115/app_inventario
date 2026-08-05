@@ -1,3 +1,4 @@
+import 'package:graei/features/producto/data/models/foto_model.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:graei/core/atomic_process/atomic_process_manager.dart';
@@ -69,9 +70,16 @@ class ActualizarProducto
 
                 if (rutasPermanentes.isNotEmpty)
                 {
+                    final List<ProductoFoto> fotosActualizadas = rutasPermanentes
+                        .map((ruta) => ProductoFoto(
+                            productoId: producto.id!,
+                            rutaFoto: ruta,
+                        ))
+                        .toList();
+
                     await _fotoRepository.registrarFotosPorProductoId(
                         producto.id!, 
-                        producto.fotos,
+                        fotosActualizadas,
                         atomicSession: session
                     );
                 }

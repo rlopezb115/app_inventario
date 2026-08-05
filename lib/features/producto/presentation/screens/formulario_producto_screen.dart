@@ -26,7 +26,9 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
     final _formKey = GlobalKey<FormState>();
     final _nombreController = TextEditingController();
     final _descripcionController = TextEditingController();
-    //final _imagePickerService = ImagePickerService();
+    
+    final _imagePickerService = ImagePickerService();
+    
     final List<String> _rutasFotosSeleccionadas = [];
     bool get _esEdicion => widget.producto != null;
 

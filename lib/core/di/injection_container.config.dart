@@ -18,10 +18,14 @@ import '../../features/producto/data/datasources/producto_local_datasource.dart'
     as _i966;
 import '../../features/producto/data/repositories/foto_repository_impl.dart'
     as _i18;
+import '../../features/producto/data/repositories/media_storage_local_repository_impl.dart'
+    as _i519;
 import '../../features/producto/data/repositories/producto_repository_impl.dart'
     as _i469;
 import '../../features/producto/domain/repositories/foto_repository.dart'
     as _i451;
+import '../../features/producto/domain/repositories/media_storage_repository.dart'
+    as _i357;
 import '../../features/producto/domain/repositories/producto_repository.dart'
     as _i398;
 import '../../features/producto/domain/usecases/actualizar_producto.dart'
@@ -53,6 +57,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i644.ImagePickerService>(
       () => _i644.ImagePickerService(),
     );
+    gh.lazySingleton<_i357.MediaStorageRepository>(
+      () => _i519.MediaStorageLocalRepositoryImpl(),
+      instanceName: 'local',
+    );
     gh.lazySingleton<_i466.AtomicProcessManager>(
       () => appModule.sqliteAtomicProcessManager,
       instanceName: 'db',
@@ -73,20 +81,25 @@ extension GetItInjectableX on _i174.GetIt {
         localDataSource: gh<_i966.ProductoLocalDataSource>(),
       ),
     );
-    gh.lazySingleton<_i412.EliminarProducto>(
-      () => _i412.EliminarProducto(
+    gh.lazySingleton<_i943.ActualizarProducto>(
+      () => _i943.ActualizarProducto(
         productoRepository: gh<_i398.ProductoRepository>(),
         fotoRepository: gh<_i451.FotoRepository>(),
-        imagePickerService: gh<_i644.ImagePickerService>(),
+        mediaStorageRepository: gh<_i357.MediaStorageRepository>(
+          instanceName: 'local',
+        ),
         atomicProcessManager: gh<_i466.AtomicProcessManager>(
           instanceName: 'db',
         ),
       ),
     );
-    gh.lazySingleton<_i943.ActualizarProducto>(
-      () => _i943.ActualizarProducto(
+    gh.lazySingleton<_i412.EliminarProducto>(
+      () => _i412.EliminarProducto(
         productoRepository: gh<_i398.ProductoRepository>(),
         fotoRepository: gh<_i451.FotoRepository>(),
+        mediaStorageRepository: gh<_i357.MediaStorageRepository>(
+          instanceName: 'local',
+        ),
         atomicProcessManager: gh<_i466.AtomicProcessManager>(
           instanceName: 'db',
         ),
@@ -96,6 +109,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i861.RegistrarProducto(
         productoRepository: gh<_i398.ProductoRepository>(),
         fotoRepository: gh<_i451.FotoRepository>(),
+        mediaStorageRepository: gh<_i357.MediaStorageRepository>(
+          instanceName: 'local',
+        ),
         atomicProcessManager: gh<_i466.AtomicProcessManager>(
           instanceName: 'db',
         ),
@@ -114,6 +130,9 @@ extension GetItInjectableX on _i174.GetIt {
         registrarProductoUC: gh<_i861.RegistrarProducto>(),
         actualizarProductoUC: gh<_i943.ActualizarProducto>(),
         eliminarProductoUC: gh<_i412.EliminarProducto>(),
+        mediaStorageRepository: gh<_i357.MediaStorageRepository>(
+          instanceName: 'local',
+        ),
       ),
     );
     return this;
