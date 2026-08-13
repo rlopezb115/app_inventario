@@ -1,3 +1,6 @@
+// ========================================================
+// ARCHIVO: lib/features/producto/presentation/screens/formulario_producto_screen.dart
+// ========================================================
 import 'package:flutter/material.dart';
 import 'package:graei/core/utils/validaciones.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +33,7 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
     final _imagePickerService = ImagePickerService();
     
     final List<String> _rutasFotosSeleccionadas = [];
+    final List<String> _fotosEliminadasEnEdicion = [];
     bool get _esEdicion => widget.producto != null;
 
     @override
@@ -44,7 +48,7 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
         if (_esEdicion)
         {
             _nombreController.text = widget.producto!.nombre;
-            _descripcionController.text = widget.producto!.descripcion!;
+            _descripcionController.text = widget.producto!.descripcion ?? '';
 
             _rutasFotosSeleccionadas.addAll(
                 widget.producto!.fotos.map((foto) => foto.rutaFoto)
@@ -99,9 +103,11 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
 
     void _removerFotoSeleccionada(int indice)
     {
+        final rutaRemovida = _rutasFotosSeleccionadas[indice];
         setState(()
         {
             _rutasFotosSeleccionadas.removeAt(indice);
+            _fotosEliminadasEnEdicion.add(rutaRemovida);
         });
     }
 
@@ -147,7 +153,6 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Se ha alcanzado el límite máximo de 5 fotografías')),
             );
-            
             return;
         }
 
@@ -168,26 +173,41 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
     {
         if (_formKey.currentState!.validate())
         {
+            final fotosModel = _rutasFotosSeleccionadas.map<ProductoFoto>((ruta) => ProductoFoto(
+                rutaFoto: ruta,
+                productoId: widget.producto?.id
+            )).toList();
+
             final producto = Producto(
                 id: widget.producto?.id,
+                codigo: widget.producto?.codigo,
                 nombre: _nombreController.text,
                 descripcion: _descripcionController.text,
-                fotos: _rutasFotosSeleccionadas.map<ProductoFoto>((ruta) => ProductoFoto(
-                    rutaFoto: ruta,
-                    productoId: widget.producto?.id
-                )).toList(),
+                fotos: fotosModel,
             );
+
+            bool guardadoExitoso = false;
 
             if (_esEdicion)
             {
-                await context.read<ProductoProvider>().actualizarProducto(producto);
+                guardadoExitoso = await context.read<ProductoProvider>().actualizarProducto(
+                    producto,
+                    _rutasFotosSeleccionadas,
+                    _fotosEliminadasEnEdicion,
+                );
             }
             else
             {
-                await context.read<ProductoProvider>().registrarNuevoProducto(producto);
+                guardadoExitoso = await context.read<ProductoProvider>().registrarNuevoProducto(
+                    producto,
+                    _rutasFotosSeleccionadas,
+                );
             }
             
-            if (mounted) Navigator.pop(context);
+            if (guardadoExitoso && mounted) 
+            {
+                Navigator.pop(context);
+            }
         }
     }
 

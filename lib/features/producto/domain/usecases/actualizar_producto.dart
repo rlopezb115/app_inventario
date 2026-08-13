@@ -77,11 +77,17 @@ class ActualizarProducto
                         ))
                         .toList();
 
+                    producto.fotos = fotosActualizadas;
+
                     await _fotoRepository.registrarFotosPorProductoId(
                         producto.id!, 
                         fotosActualizadas,
                         atomicSession: session
                     );
+                }
+                else
+                {
+                    producto.fotos = [];
                 }
 
                 success = true;

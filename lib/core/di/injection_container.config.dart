@@ -130,9 +130,6 @@ extension GetItInjectableX on _i174.GetIt {
         registrarProductoUC: gh<_i861.RegistrarProducto>(),
         actualizarProductoUC: gh<_i943.ActualizarProducto>(),
         eliminarProductoUC: gh<_i412.EliminarProducto>(),
-        mediaStorageRepository: gh<_i357.MediaStorageRepository>(
-          instanceName: 'local',
-        ),
       ),
     );
     return this;

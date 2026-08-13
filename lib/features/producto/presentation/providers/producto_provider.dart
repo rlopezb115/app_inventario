@@ -1,9 +1,9 @@
+// ========================================================
+// ARCHIVO: lib/features/producto/presentation/providers/producto_provider.dart
+// ========================================================
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:graei/core/di/injection_names.dart';
-import 'package:graei/core/extensions/cadena_extension.dart';
 import 'package:graei/core/utils/cancellation_token.dart';
-import 'package:graei/features/producto/domain/repositories/media_storage_repository.dart';
 import 'package:graei/features/producto/domain/usecases/actualizar_producto.dart';
 import 'package:injectable/injectable.dart';
 import 'package:graei/features/producto/data/models/producto_model.dart';
@@ -15,25 +15,16 @@ import 'package:graei/features/producto/domain/usecases/registrar_producto.dart'
 @injectable
 class ProductoProvider with ChangeNotifier
 {
-    // Inyección de Casos de Uso
     final ObtenerProductosPaginados _obtenerProductosPaginadosUC;
     final BuscarProductos _buscarProductosUC;
     final RegistrarProducto _registrarProductoUC;
     final ActualizarProducto _actualizarProductoUC;
     final EliminarProducto _eliminarProductoUC;
-
-    // 2. Abstracción del Almacenamiento Local (para captura y borrado de borrador)
-    final MediaStorageRepository _mediaStorageRepository;
+    // final MediaStorageRepository _mediaStorageRepository;
     
-    // Estados de la UI
     List<Producto> _productos = [];
     List<Producto> get productos => _productos;
 
-    List<String> _rutasFotosSeleccionadas = [];
-    List<String> get rutasFotosSeleccionadas => _rutasFotosSeleccionadas;
-
-    final List<String> _fotosEliminadasEnEdicion = [];
-    
     bool _isLoading = false;
     bool get isLoading => _isLoading;
 
@@ -52,7 +43,7 @@ class ProductoProvider with ChangeNotifier
         required this._registrarProductoUC,
         required this._actualizarProductoUC,
         required this._eliminarProductoUC,
-        @Named(InjectionNames.mediaStorageLocal) required this._mediaStorageRepository,
+        // @Named(InjectionNames.mediaStorageLocal) required this._mediaStorageRepository,
     });
 
     Future<void> inicializarCatalogo() async
@@ -87,17 +78,13 @@ class ProductoProvider with ChangeNotifier
             _offset += _limit;
     
         } catch (e) {
-            
             _errorMessage = e.toString();
-
         } finally {
-      
             _isLoading = false;
             notifyListeners();
         }
     }
 
-    // NUEVO: Implementa debounce de 300ms[cite: 3]
     void cambiarFiltroBusqueda(String texto)
     {
         if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -112,42 +99,15 @@ class ProductoProvider with ChangeNotifier
         });
     }
 
-    void inicializarFotos(List<String> fotosExistentes)
-    {
-        _rutasFotosSeleccionadas = List.from(fotosExistentes);
-        _fotosEliminadasEnEdicion.clear();
-        notifyListeners();
-    }
-
-    Future<void> capturarFoto(int indice) async
-    {
-        final String? rutaTmp = await _mediaStorageRepository.capturarImagenTemporal(index: indice);
-        if (rutaTmp.esDiferenteDeNuloYVacio)
-        {
-            _rutasFotosSeleccionadas.add(rutaTmp!);
-            notifyListeners();
-        }
-    }
-
-    Future<void> removerFoto(int indice) async
-    {
-        final String rutaRemovida = _rutasFotosSeleccionadas.removeAt(indice);
-
-        if (rutaRemovida.contains('temp_prod_'))
-        {
-            await _mediaStorageRepository.eliminarArchivoFisico(rutaRemovida);
-        }
-        else
-        {
-            _fotosEliminadasEnEdicion.add(rutaRemovida);
-        }
-
-        notifyListeners();
-    }
-
     Future<void> limpiarBusqueda() async
     {
-        await inicializarCatalogo();
+        _filtroActivo = "";
+        _productos.clear();
+        _offset = 0;
+        _tieneMasDatos = true;
+        notifyListeners(); // IMPORTANTE: Notifica a los listeners que la lista cambió
+        
+        await cargarSiguienteBloque();
     }
 
     void _setLoading(bool value)
@@ -164,7 +124,20 @@ class ProductoProvider with ChangeNotifier
         notifyListeners();
     }
 
-    Future<bool> registrarNuevoProducto(Producto producto, { CancellationToken? cancelToken }) async
+    /// Recarga la lista desde cero manteniendo el filtro de búsqueda que esté activo en el momento.
+    Future<void> recargarCatalogoConFiltroActual() async
+    {
+        _productos.clear();
+        _offset = 0;
+        _tieneMasDatos = true;
+        await cargarSiguienteBloque();
+    }
+
+    Future<bool> registrarNuevoProducto(
+        Producto producto, 
+        List<String> rutasFotos, { 
+        CancellationToken? cancelToken 
+    }) async
     {
         bool success = false;
         _setLoading(true);
@@ -173,11 +146,14 @@ class ProductoProvider with ChangeNotifier
         {
             await _registrarProductoUC.execute(
                 producto,
-                _rutasFotosSeleccionadas,
+                rutasFotos,
                 cancelToken: cancelToken
             );
 
-            await inicializarCatalogo();
+            _setLoading(false);
+
+            // Refrescamos el catálogo usando el filtro que esté activo actualmente
+            await recargarCatalogoConFiltroActual();
             success = true;
         }
         catch (e)
@@ -192,7 +168,12 @@ class ProductoProvider with ChangeNotifier
         return success;
     }
 
-    Future<bool> actualizarProducto(Producto producto, { CancellationToken? cancelToken }) async
+    Future<bool> actualizarProducto(
+        Producto producto, 
+        List<String> rutasFotos, 
+        List<String> fotosEliminadas, { 
+        CancellationToken? cancelToken 
+    }) async
     {
         _setLoading(true);
         bool success = false;
@@ -201,8 +182,8 @@ class ProductoProvider with ChangeNotifier
         {
             if (await _actualizarProductoUC.execute(
                 producto,
-                _rutasFotosSeleccionadas,
-                _fotosEliminadasEnEdicion,
+                rutasFotos,
+                fotosEliminadas,
                 cancelToken: cancelToken
             ))
             {
@@ -210,9 +191,9 @@ class ProductoProvider with ChangeNotifier
                 if (index != -1)
                 {
                     _productos[index] = producto;
-                    notifyListeners();
-                    success = true;
                 }
+                notifyListeners();
+                success = true;
             }
         }
         catch (e)

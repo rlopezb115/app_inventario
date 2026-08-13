@@ -1,3 +1,4 @@
+import 'package:graei/features/producto/data/models/foto_model.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:graei/core/atomic_process/atomic_process_manager.dart';
@@ -56,7 +57,18 @@ class RegistrarProducto
 
                 if (rutasPermanentes.isNotEmpty)
                 {
-                    await _fotoRepository.registrarFotosPorProductoId(productoId, producto.fotos, atomicSession: session);
+                    final List<ProductoFoto> fotosParaInsertar = rutasPermanentes
+                        .map((ruta) => ProductoFoto(
+                            productoId: productoId,
+                            rutaFoto: ruta,
+                        ))
+                        .toList();
+
+                    await _fotoRepository.registrarFotosPorProductoId(
+                        productoId, 
+                        fotosParaInsertar, 
+                        atomicSession: session
+                    );
                 }
             });
 

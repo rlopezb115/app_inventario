@@ -144,14 +144,28 @@ class _ProductoBuscadorScreenState extends State<ProductoBuscadorScreen>
 
     Future<void> _crearNuevoProducto() async
     {
-        _searchController.clear();
+        final provider = context.read<ProductoProvider>();
 
+        // 1. Si hay texto de búsqueda, limpiamos la caja de texto y el filtro del Provider
+        if (_searchController.text.isNotEmpty)
+        {
+            _searchController.clear();
+            provider.limpiarBusqueda();
+        }
+
+        // 2. Navegamos al formulario y esperamos a que el usuario regrese
         await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => const FormularioProductoScreen(),
             ),
         );
+
+        // 3. Al volver del formulario, forzamos la actualización de la pantalla
+        if (mounted)
+        {
+            setState(() {});
+        }
     }
 
     void _editarProducto(Producto productoSeleccionado)
