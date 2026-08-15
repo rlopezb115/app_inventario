@@ -1,19 +1,17 @@
-import 'package:injectable/injectable.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:graei/core/database/database_helper.dart';
 import 'package:graei/core/atomic_process/atomic_process_manager.dart';
 import 'package:graei/core/atomic_process/atomic_session.dart';
-import 'package:graei/core/di/injection_names.dart';
 import 'package:graei/core/exceptions/process_aborted_exception.dart';
 
 class SqfliteAtomicSession implements AtomicSession
 {
-    final Transaction txn;
-    SqfliteAtomicSession(this.txn);
+    final Transaction _txn;
+    SqfliteAtomicSession(this._txn);
 
     @override
-    Transaction get session => txn;
+    Transaction get session => _txn;
 
     @override
     void abort(String reason)
@@ -24,17 +22,16 @@ class SqfliteAtomicSession implements AtomicSession
     }
 }
 
-@Named(InjectionNames.dbAtomic)
 class SqfliteAtomicProcessManager implements AtomicProcessManager
 {
-    final DatabaseHelper dbHelper;
+    final DatabaseHelper _dbHelper;
 
-    SqfliteAtomicProcessManager({required this.dbHelper});
+    SqfliteAtomicProcessManager({required this._dbHelper});
 
     @override
     Future<T> runInAtomicProcess<T>(Future<T> Function(AtomicSession session) action) async
     {
-        final db = await dbHelper.database;
+        final db = await _dbHelper.database;
         
         return await db.transaction((txn) async
         {

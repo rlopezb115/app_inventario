@@ -62,7 +62,7 @@ extension GetItInjectableX on _i174.GetIt {
       instanceName: 'local',
     );
     gh.lazySingleton<_i466.AtomicProcessManager>(
-      () => appModule.sqliteAtomicProcessManager,
+      () => appModule.sqliteAtomicProcessManager(gh<_i64.DatabaseHelper>()),
       instanceName: 'db',
     );
     gh.lazySingleton<_i688.FotoLocalDataSource>(
@@ -118,10 +118,16 @@ extension GetItInjectableX on _i174.GetIt {
       ),
     );
     gh.lazySingleton<_i1001.BuscarProductos>(
-      () => _i1001.BuscarProductos(gh<_i398.ProductoRepository>()),
+      () => _i1001.BuscarProductos(
+        gh<_i398.ProductoRepository>(),
+        gh<_i451.FotoRepository>(),
+      ),
     );
     gh.lazySingleton<_i521.ObtenerProductosPaginados>(
-      () => _i521.ObtenerProductosPaginados(gh<_i398.ProductoRepository>()),
+      () => _i521.ObtenerProductosPaginados(
+        gh<_i398.ProductoRepository>(),
+        gh<_i451.FotoRepository>(),
+      ),
     );
     gh.factory<_i778.ProductoProvider>(
       () => _i778.ProductoProvider(

@@ -1,7 +1,7 @@
 class ProductoFoto
 {
-	int? id;
-  	int? productoId;
+	final int? id;
+  	final int? productoId;
   	final String rutaFoto;
 
   	ProductoFoto({
@@ -29,4 +29,16 @@ class ProductoFoto
       		rutaFoto: map['ruta_foto'],
     	);
   	}
+
+    ProductoFoto copyWith({
+        int? id,
+        int? productoId,
+        String? rutaFoto,
+    }) {
+        return ProductoFoto(
+            id: id ?? this.id,
+            productoId: productoId ?? this.productoId,
+            rutaFoto: rutaFoto ?? this.rutaFoto
+        );
+    }
 }

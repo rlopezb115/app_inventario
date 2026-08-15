@@ -7,36 +7,36 @@ import 'package:graei/features/producto/domain/repositories/producto_repository.
 @LazySingleton(as: ProductoRepository)
 class ProductoRepositoryImpl implements ProductoRepository
 {
-    final ProductoLocalDataSource localDataSource;
-    ProductoRepositoryImpl({required this.localDataSource});
+    final ProductoLocalDataSource _localDataSource;
+    ProductoRepositoryImpl({required this._localDataSource});
 
     @override
     Future<List<Producto>> obtenerProductosPaginados(int limit, int offset)
     {
-        return localDataSource.obtenerProductosPaginados(limit, offset);
+        return _localDataSource.obtenerProductosPaginados(limit, offset);
     }
 
     @override
     Future<List<Producto>> buscarProductos(String query, int limit, int offset)
     {
-        return localDataSource.buscarProductos(query, limit, offset);
+        return _localDataSource.buscarProductos(query, limit, offset);
     }
 
     @override
     Future<int> registrarProducto(Producto producto, { AtomicSession? atomicSession })
     {
-        return localDataSource.registrarProductoTransaccional(producto, atomicSession: atomicSession);
+        return _localDataSource.registrarProductoTransaccional(producto, atomicSession: atomicSession);
     }
 
     @override
     Future<bool> actualizarProductoTransaccional(Producto producto, { AtomicSession? atomicSession })
     {
-        return localDataSource.actualizarProductoTransaccional(producto, atomicSession: atomicSession);
+        return _localDataSource.actualizarProductoTransaccional(producto, atomicSession: atomicSession);
     }
 
     @override
     Future<void> eliminarProducto(int id, { AtomicSession? atomicSession })
     {
-        return localDataSource.eliminarProducto(id, atomicSession: atomicSession);
+        return _localDataSource.eliminarProducto(id, atomicSession: atomicSession);
     }
 }

@@ -1,6 +1,3 @@
-// ========================================================
-// ARCHIVO: lib/features/producto/presentation/providers/producto_provider.dart
-// ========================================================
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:graei/core/utils/cancellation_token.dart';
@@ -22,7 +19,7 @@ class ProductoProvider with ChangeNotifier
     final EliminarProducto _eliminarProductoUC;
     // final MediaStorageRepository _mediaStorageRepository;
     
-    List<Producto> _productos = [];
+    final List<Producto> _productos = [];
     List<Producto> get productos => _productos;
 
     bool _isLoading = false;
@@ -192,6 +189,7 @@ class ProductoProvider with ChangeNotifier
                 {
                     _productos[index] = producto;
                 }
+                
                 notifyListeners();
                 success = true;
             }
@@ -228,5 +226,11 @@ class ProductoProvider with ChangeNotifier
         }
 
         return success;
+    }
+
+    @override
+    void dispose() {
+        _debounce?.cancel();
+        super.dispose();
     }
 }

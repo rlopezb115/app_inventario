@@ -3,11 +3,11 @@ import 'foto_model.dart';
 class Producto
 {
   	final int? id;
-  	String nombre;
-  	String? descripcion;
-  	String? codigo;
-  	String? fechaRegistro;
-  	List<ProductoFoto> fotos; // Ahora estructurado usando nuestro nuevo foto_model.dart
+  	final String nombre;
+  	final String? descripcion;
+  	final String? codigo;
+  	final String? fechaRegistro;
+  	final List<ProductoFoto>? fotos;
 
   	Producto({
     	this.id,
@@ -40,4 +40,22 @@ class Producto
       		fotos: fotos,
     	);
   	}
+
+    Producto copyWith({
+        int? id,
+        String? nombre,
+        String? descripcion,
+        String? codigo,
+        String? fechaRegistro,
+        List<ProductoFoto>? fotos,
+    }) {
+        return Producto(
+            id: id ?? this.id,
+            nombre: nombre ?? this.nombre,
+            descripcion: descripcion ?? this.descripcion,
+            codigo: codigo ?? this.codigo,
+            fechaRegistro: fechaRegistro ?? this.fechaRegistro,
+            fotos: fotos ?? this.fotos,
+        );
+    }
 }

@@ -1,5 +1,4 @@
 import 'package:injectable/injectable.dart';
-import 'package:sqflite/sqflite.dart';
 
 import 'package:graei/core/atomic_process/atomic_session.dart';
 import 'package:graei/core/database/database_helper.dart';
@@ -8,13 +7,35 @@ import 'package:graei/features/producto/data/models/foto_model.dart';
 @lazySingleton
 class FotoLocalDataSource
 {
-    final DatabaseHelper dbHelper;
+    final DatabaseHelper _dbHelper;
 
-    FotoLocalDataSource({required this.dbHelper});
+    FotoLocalDataSource({required this._dbHelper});
+
+    Future<List<ProductoFoto>> obtenerRutasFotosPorProductoRangoId({
+        required List<int> productosId
+    }) async {
+
+        final db = await _dbHelper.database;
+        final String placeholders = List.filled(productosId.length, '?').join(',');
+        final List<Map<String, dynamic>> resFotos = await db.query(
+            'producto_foto',
+            where: 'producto_id IN ($placeholders)',
+            whereArgs: productosId,
+        );
+
+        final List<ProductoFoto> fotos = [];
+        for (var fotoMap in resFotos)
+        {
+            final foto = ProductoFoto.fromMap(fotoMap);
+            fotos.add(foto);
+        }
+
+        return fotos;
+    }
     
     Future<List<String>> obtenerRutasFotosPorProductoId(int productoId) async
     {
-        final db = await dbHelper.database;
+        final db = await _dbHelper.database;
 
         final List<Map<String, dynamic>> resFotos = await db.query(
             'producto_foto',
@@ -29,15 +50,11 @@ class FotoLocalDataSource
     Future<void> registrarFotosPorProductoId(int productoId, List<ProductoFoto> fotos, {AtomicSession? atomicSession}) async
     {
         int id = 0;
-        final DatabaseExecutor executor = atomicSession != null 
-                                          ? atomicSession.session as Transaction 
-                                          : await dbHelper.database;
-
+        final executor = atomicSession?.session ?? await _dbHelper.database;
         for (ProductoFoto foto in fotos)
         {
-            foto.id = ++id;
-            foto.productoId = productoId;
-            await executor.insert('producto_foto', foto.toMap());
+            final nuevaFoto = foto.copyWith(id: ++id, productoId: productoId).toMap();
+            await executor.insert('producto_foto', nuevaFoto);
         }
     }
 
@@ -45,10 +62,7 @@ class FotoLocalDataSource
     /// Si se le provee una [atomicSession], la operación se une de forma atómica a ella.
     Future<void> eliminarFotosPorProductoId(int productoId, {AtomicSession? atomicSession}) async
     {
-        final DatabaseExecutor executor = atomicSession != null 
-                                          ? atomicSession.session as Transaction 
-                                          : await dbHelper.database;
-
+        final executor = atomicSession?.session ?? await _dbHelper.database;
         await executor.delete(
             'producto_foto',
             where: 'producto_id = ?',

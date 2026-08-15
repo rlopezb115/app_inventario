@@ -38,11 +38,11 @@ class ProductoCard extends StatelessWidget
                                         color: Theme.of(context).colorScheme.surfaceContainerHighest,
                                         borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: _producto.fotos.isNotEmpty
+                                    child: _producto.fotos?.isNotEmpty ?? false
                                     ?
                                         ClipRRect(
                                             borderRadius: BorderRadius.circular(8),
-                                            child: Image.file(File(_producto.fotos.first.rutaFoto), fit: BoxFit.cover),
+                                            child: Image.file(File(_producto.fotos!.first.rutaFoto), fit: BoxFit.cover),
                                         )
                                     : 
                                         const Center(

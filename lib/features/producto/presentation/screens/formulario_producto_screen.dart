@@ -13,11 +13,11 @@ import 'package:graei/features/producto/presentation/widgets/foto_carrete.dart';
 
 class FormularioProductoScreen extends StatefulWidget
 {
-    final Producto? producto;
+    final Producto? _producto;
 
     const FormularioProductoScreen({
         super.key,
-        this.producto
+        this._producto
     });
 
     @override
@@ -34,7 +34,7 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
     
     final List<String> _rutasFotosSeleccionadas = [];
     final List<String> _fotosEliminadasEnEdicion = [];
-    bool get _esEdicion => widget.producto != null;
+    bool get _esEdicion => widget._producto != null;
 
     @override
     void initState()
@@ -47,11 +47,11 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
     {
         if (_esEdicion)
         {
-            _nombreController.text = widget.producto!.nombre;
-            _descripcionController.text = widget.producto!.descripcion ?? '';
+            _nombreController.text = widget._producto!.nombre;
+            _descripcionController.text = widget._producto!.descripcion ?? '';
 
             _rutasFotosSeleccionadas.addAll(
-                widget.producto!.fotos.map((foto) => foto.rutaFoto)
+                widget._producto?.fotos?.map((foto) => foto.rutaFoto) ?? []
             );
         }
     }
@@ -175,12 +175,12 @@ class _FormularioProductoScreenState extends State<FormularioProductoScreen>
         {
             final fotosModel = _rutasFotosSeleccionadas.map<ProductoFoto>((ruta) => ProductoFoto(
                 rutaFoto: ruta,
-                productoId: widget.producto?.id
+                productoId: widget._producto?.id
             )).toList();
 
             final producto = Producto(
-                id: widget.producto?.id,
-                codigo: widget.producto?.codigo,
+                id: widget._producto?.id,
+                codigo: widget._producto?.codigo,
                 nombre: _nombreController.text,
                 descripcion: _descripcionController.text,
                 fotos: fotosModel,

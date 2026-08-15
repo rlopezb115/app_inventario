@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 
 class FotoCarrete extends StatelessWidget
 {
-    final List<String> rutas;
-    final VoidCallback onAdd;
-    final Function(int) onDelete;
+    final List<String> _rutas;
+    final VoidCallback _onAdd;
+    final Function(int) _onDelete;
 
     const FotoCarrete({
         super.key,
-        required this.rutas,
-        required this.onAdd,
-        required this.onDelete,
+        required this._rutas,
+        required this._onAdd,
+        required this._onDelete,
     });
 
     @override
@@ -21,18 +21,18 @@ class FotoCarrete extends StatelessWidget
             height: 100,
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: rutas.length + 1,
+                itemCount: _rutas.length + 1,
                 itemBuilder: (context, index)
                 {
-                    if (index == rutas.length)
+                    if (index == _rutas.length)
                     {
                         // Botón de agregar foto (solo visible si hay menos de 5 fotos)
-                        return rutas.length < 5
+                        return _rutas.length < 5
                         ?
                             Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: GestureDetector(
-                                    onTap: onAdd,
+                                    onTap: _onAdd,
                                     child: Container(
                                         width: 84,
                                         height: 84,
@@ -49,7 +49,7 @@ class FotoCarrete extends StatelessWidget
                             const SizedBox.shrink();
                     }
 
-                    final ruta = rutas[index];
+                    final ruta = _rutas[index];
 
                     return Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -72,7 +72,7 @@ class FotoCarrete extends StatelessWidget
                                     top: -8,
                                     right: -8,
                                     child: GestureDetector(
-                                        onTap: () => onDelete(index),
+                                        onTap: () => _onDelete(index),
                                         child: const CircleAvatar(
                                             radius: 12,
                                             backgroundColor: Colors.red,

@@ -6,4 +6,5 @@ abstract class FotoRepository
     Future<List<String>> obtenerRutasFotosPorProductoId(int productoId);
     Future<void> registrarFotosPorProductoId(int productoId, List<ProductoFoto> fotos, { AtomicSession? atomicSession });
     Future<void> eliminarFotosPorProductoId(int productoId, { AtomicSession? atomicSession });
+    Future<List<ProductoFoto>> obtenerRutasFotosPorProductoRangoId(List<int> productosId);
 }

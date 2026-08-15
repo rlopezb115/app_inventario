@@ -10,8 +10,9 @@ abstract class AppModule {
 
     @Named(InjectionNames.dbAtomic)
     @LazySingleton()
-    AtomicProcessManager get sqliteAtomicProcessManager {
-        return SqfliteAtomicProcessManager(dbHelper: DatabaseHelper());
+    AtomicProcessManager sqliteAtomicProcessManager(DatabaseHelper dbHelper)
+    {
+        return SqfliteAtomicProcessManager(dbHelper: dbHelper);
     }
-
+    
 }

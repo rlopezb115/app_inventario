@@ -77,17 +77,13 @@ class ActualizarProducto
                         ))
                         .toList();
 
-                    producto.fotos = fotosActualizadas;
-
+                    producto = producto.copyWith(fotos: fotosActualizadas);
                     await _fotoRepository.registrarFotosPorProductoId(
                         producto.id!, 
                         fotosActualizadas,
                         atomicSession: session
                     );
-                }
-                else
-                {
-                    producto.fotos = [];
+
                 }
 
                 success = true;
@@ -100,6 +96,7 @@ class ActualizarProducto
         }
         on ProcessAbortedException {
             // print('El proceso de ''Registrar Producto'' fue abortado y revertido: ${e.message}');
+            rethrow;
         }
         catch (e)
         {

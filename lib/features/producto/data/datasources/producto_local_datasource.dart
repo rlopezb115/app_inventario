@@ -1,22 +1,20 @@
 import 'package:graei/core/extensions/numero_extension.dart';
 import 'package:graei/core/utils/generador_codigo.dart';
 import 'package:injectable/injectable.dart';
-import 'package:sqflite/sqflite.dart';
 
 import 'package:graei/core/atomic_process/atomic_session.dart';
 import 'package:graei/core/database/database_helper.dart';
-import 'package:graei/features/producto/data/models/foto_model.dart';
 import 'package:graei/features/producto/data/models/producto_model.dart';
 
 @lazySingleton
 class ProductoLocalDataSource
 {
-  	final DatabaseHelper dbHelper;
-  	ProductoLocalDataSource({required this.dbHelper});
+  	final DatabaseHelper _dbHelper;
+  	ProductoLocalDataSource({required this._dbHelper});
 
   	Future<List<Producto>> obtenerProductosPaginados(int limit, int offset) async
 	{
-    	final db = await dbHelper.database;
+    	final db = await _dbHelper.database;
     
 		// Consulta paginada de productos
     	final List<Map<String, dynamic>> resProductos = await db.query(
@@ -26,30 +24,13 @@ class ProductoLocalDataSource
       		orderBy: 'fecha_registro DESC',
     	);
 
-    	List<Producto> listaProductos = [];
-    	for (var prodMap in resProductos)
-		{
-      		final producto = Producto.fromMap(prodMap);
-      		final List<Map<String, dynamic>> resFotos = await db.query(
-        		'producto_foto',
-        		where: 'producto_id = ?',
-        		whereArgs: [producto.id],
-      		);
-      
-      		producto.fotos = resFotos.map((f) => ProductoFoto.fromMap(f)).toList();
-      		listaProductos.add(producto);
-    	}
-    
-		return listaProductos;
+    	return resProductos.map((map) => Producto.fromMap(map)).toList();
   	}
 
     Future<Producto?> obtenerProducto(int id, { AtomicSession? atomicSession }) async
 	{
         if (!id.esMayorACero) return null;
-        final DatabaseExecutor executor = atomicSession != null
-                                      ? atomicSession.session
-                                      : await dbHelper.database;
-
+        final executor = atomicSession?.session ?? await _dbHelper.database;
     	final List<Map<String, dynamic>> resProducto = await executor.query(
             'producto', 
             where: 'id = ?', 
@@ -63,10 +44,8 @@ class ProductoLocalDataSource
 
   	Future<List<Producto>> buscarProductos(String query, int limit, int offset) async
 	{
-    	final db = await dbHelper.database;
+    	final db = await _dbHelper.database;
     	final String likeQuery = '%$query%';
-
-    	// Búsqueda usando LIKE en código y nombre[cite: 3]
     	final List<Map<String, dynamic>> resProductos = await db.query(
       		'producto',
       		where: 'codigo LIKE ? OR nombre LIKE ?',
@@ -75,31 +54,18 @@ class ProductoLocalDataSource
       		offset: offset,
     	);
 
-    	List<Producto> listaProductos = [];
-    	for (var prodMap in resProductos)
-		{
-      		final producto = Producto.fromMap(prodMap);
-      		final List<Map<String, dynamic>> resFotos = await db.query(
-        		'producto_foto',
-        		where: 'producto_id = ?',
-        		whereArgs: [producto.id],
-      		);
-      
-	  		producto.fotos = resFotos.map((f) => ProductoFoto.fromMap(f)).toList();
-      		listaProductos.add(producto);
-    	}
-    	
-		return listaProductos;
+    	return resProductos.map((map) => Producto.fromMap(map)).toList();
   	}
     
   	Future<int> registrarProductoTransaccional(Producto producto, { AtomicSession? atomicSession  }) async
 	{
-    	final DatabaseExecutor executor = atomicSession != null
-                                          ? atomicSession.session
-                                          : await dbHelper.database;
+    	final executor = atomicSession?.session ?? await _dbHelper.database;
 
-        producto.codigo = GeneradorCodigo.alfanumerico();
-        producto.fechaRegistro = DateTime.now().toIso8601String();
+        producto = producto.copyWith(
+            codigo: GeneradorCodigo.alfanumerico(),
+            fechaRegistro: DateTime.now().toUtc().toIso8601String()
+        );
+        
         final int productoId = await executor.insert('producto', producto.toMap());
         return productoId;
   	}
@@ -109,15 +75,14 @@ class ProductoLocalDataSource
         if (!producto.id.esMayorACero) return false;
 
         int filasAfectadas = 0;
-        final productoActual = await obtenerProducto(producto.id!, atomicSession: atomicSession);
+        Producto? productoActual = await obtenerProducto(producto.id!, atomicSession: atomicSession);
         if (productoActual != null)
         {
-            final DatabaseExecutor executor = atomicSession != null
-                                            ? atomicSession.session
-                                            : await dbHelper.database;
-
-            productoActual.nombre = producto.nombre;
-            productoActual.descripcion = producto.descripcion;
+            final executor = atomicSession?.session ?? await _dbHelper.database;
+            productoActual = productoActual.copyWith(
+                nombre: producto.nombre,
+                descripcion: producto.descripcion,
+            );
 
             filasAfectadas = await executor.update(
                 'producto',
@@ -125,19 +90,14 @@ class ProductoLocalDataSource
                 where: 'id = ?',
                 whereArgs: [producto.id]
             );
-
         }
-
 
         return filasAfectadas.esMayorACero;
     }
 
   	Future<void> eliminarProducto(int id, { AtomicSession? atomicSession }) async
 	{
-        final DatabaseExecutor executor = atomicSession != null 
-                                          ? atomicSession.session
-                                          : await dbHelper.database;
-
+        final executor = atomicSession?.session ?? await _dbHelper.database;
     	await executor.delete(
             'producto', 
             where: 'id = ?', 

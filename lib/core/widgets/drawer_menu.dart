@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 class DrawerOption
 {
-	final IconData icon;
-	final String title;
-	final Widget targetScreen; // Pasamos la pantalla como parámetro de destino
-	final bool isSelected;
+	final IconData _icon;
+	final String _title;
+	final Widget _targetScreen; // Pasamos la pantalla como parámetro de destino
+	final bool _isSelected;
 
   	const DrawerOption({
-    	required this.icon,
-    	required this.title,
-    	required this.targetScreen,
-    	this.isSelected = false,
+    	required this._icon,
+    	required this._title,
+    	required this._targetScreen,
+    	this._isSelected = false,
   	});
 }
 
@@ -47,17 +47,17 @@ class DrawerMenu extends StatelessWidget
 							{
                 				final option = options[index];
                 				return ListTile(
-                  					leading: Icon(option.icon),
-									title: Text(option.title),
-                  					selected: option.isSelected,
+                  					leading: Icon(option._icon),
+									title: Text(option._title),
+                  					selected: option._isSelected,
                   					onTap: ()
 									{
                     					Navigator.pop(context); // Cierra el Drawer
-                    					if (!option.isSelected)
+                    					if (!option._isSelected)
 										{
                       						Navigator.pushReplacement(
                         						context,
-                        						MaterialPageRoute(builder: (context) => option.targetScreen),
+                        						MaterialPageRoute(builder: (context) => option._targetScreen),
                       						);
                     					}
                   					},

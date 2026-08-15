@@ -2,9 +2,9 @@
 /// o abortado de manera segura antes de completarse.
 class ProcessAbortedException implements Exception
 {
-    final String message;
-    ProcessAbortedException(this.message);
+    final String _message;
+    ProcessAbortedException(this._message);
     
     @override
-    String toString() => 'ProcessAbortedException: $message';
+    String toString() => 'ProcessAbortedException: $_message';
 }
